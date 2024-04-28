@@ -246,6 +246,11 @@ class Parser
                         } else {
                             if (!($this->flags & self::IGNORE_UNKNOWN_VARIABLES)) {
                                 if (!\in_array($token->value, $this->names, true)) {
+                                    if ($this->stream->current->test(Token::PUNCTUATION_TYPE, '??')) {
+                                        // Force null for non-existent variables when using the null coalesce operator
+                                        return new Node\ConstantNode(null);
+                                    }
+
                                     throw new SyntaxError(sprintf('Variable "%s" is not valid.', $token->value), $token->cursor, $this->stream->getExpression(), $token->value, $this->names);
                                 }
 
